@@ -19,21 +19,11 @@ describe Oystercard do
     end
 
     it "throws an error if the limit is exceeded" do
-      allow(card).to receive(:exceed_limit).and_return(true)
-      expect{ card.topup(10) }.to raise_error "Sorry, limit exceeded!"
+      limit = Oystercard::LIMIT
+      card.topup(limit)
+      expect{ card.topup(1) }.to raise_error "Sorry, limit of #{limit} exceeded!"
     end
 
   end
-
-  it { is_expected.to respond_to(:exceed_limit) }
-
-  context "#exceed_limit" do
-
-    it "returns true or false" do
-      expect(card.exceed_limit).to be(true).or be(false)
-    end
-
-  end
-
 
 end

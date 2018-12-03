@@ -9,12 +9,8 @@ class Oystercard
   end
 
   def topup(money)
-    raise 'Sorry, limit exceeded!' if exceed_limit == true
+    raise "Sorry, limit of #{Oystercard::LIMIT} exceeded!" if money + @balance > LIMIT
     @balance += money
-  end
-
-  def exceed_limit
-    @balance >= LIMIT ? true : false
   end
 
 end
