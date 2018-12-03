@@ -48,5 +48,8 @@ DEPENDENCIES
   rubocop (= 0.60.0)
   simplecov
 
+RUBY VERSION
+   ruby 2.5.1p57
+
 BUNDLED WITH
    1.17.1
