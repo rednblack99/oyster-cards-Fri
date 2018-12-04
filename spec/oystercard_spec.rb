@@ -29,10 +29,41 @@ describe Oystercard do
     it  { is_expected.to respond_to(:deduct).with(1).argument }
 
     it "deducts a specific amount from the balance" do
+      card.topup(90)
       expect{ card.deduct(10) }.to change { card.balance }.by(-10)
     end
   end
 
+  describe "#touch_in" do
+    before(:each) do
+      card.topup(Oystercard::LIMIT)
+    end
+
+    it  { is_expected.to respond_to(:touch_in) }
+
+    it "returns true" do
+      card.touch_in
+      expect(card).to be_in_journey
+    end
+  end
+
+  describe "#touch_out" do
+    it  { is_expected.to respond_to(:touch_out) }
+
+    it "returns false" do
+      card.touch_in
+      card.touch_out
+      expect(card).not_to be_in_journey
+    end
+  end
+
+  describe "#in_journey?" do
+    it  { is_expected.to respond_to(:in_journey?) }
+
+    it "returns either true or false" do
+      expect(card.in_journey?).to be(true).or be(false)
+    end
+  end
 
 
 end
