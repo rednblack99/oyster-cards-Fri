@@ -10,9 +10,8 @@ describe Oystercard do
     expect(card.balance).to eq(0)
   end
 
-  context "#topup" do
-
-  it  { is_expected.to respond_to(:topup).with(1).argument }
+  describe "#topup" do
+    it  { is_expected.to respond_to(:topup).with(1).argument }
 
     it "tops up the current balance of the card with whatever value is passed as an argument" do
       expect{ card.topup(1) }.to change{ card.balance }.by(1)
@@ -24,7 +23,16 @@ describe Oystercard do
       exceeding = card.balance + 1 - limit
       expect{ card.topup(1) }.to raise_error "Sorry, you have exceeded the limit by #{exceeding} pounds!"
     end
-
   end
+
+  describe "#deduct" do
+    it  { is_expected.to respond_to(:deduct).with(1).argument }
+
+    it "deducts a specific amount from the balance" do
+      expect{ card.deduct(10) }.to change { card.balance }.by(-10)
+    end
+  end
+
+
 
 end
