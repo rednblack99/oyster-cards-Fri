@@ -3,32 +3,34 @@ class Oystercard
   attr_reader :balance
 
   LIMIT = 90
+  MINIMUM = 1
 
   def initialize(balance = 0, state = false)
     @balance = balance
     @state = state
   end
 
-  def topup(money)
+  def top_up(money)
     exceeding = @balance + money - LIMIT
-    raise "Sorry, you have exceeded the limit by #{exceeding} pounds!" if money + @balance > LIMIT
-    @balance += money
-  end
-
-  def deduct(amount)
-    @balance -= amount
+    money + @balance > LIMIT ? raise("Sorry, you have exceeded the limit by #{exceeding} pounds!") : @balance += money
   end
 
   def touch_in
-    @state = true if @balance > 0
+    @state = true
   end
 
   def touch_out
-    @state = false if @state == true
+    deduct(MINIMUM)
+    @state = false
   end
 
   def in_journey?
     @state
+  end
+
+  private
+  def deduct(amount)
+    @balance -= amount
   end
 
 end
