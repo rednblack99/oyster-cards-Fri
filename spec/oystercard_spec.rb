@@ -4,8 +4,14 @@ describe Oystercard do
 
   let(:card) { Oystercard.new }
   let(:entry_station) { double(:entry_station) }
+  let(:exit_station) { double(:exit_station)}
+  let(:journey) { { :entry_station => :exit_station } }
 
   it { is_expected.to respond_to(:balance) }
+
+  it "journey is empty" do 
+    expect(card.journeys).to be_empty 
+   end 
 
   it "checks that initialized balance is 0" do
     expect(card.balance).to eq(0)
@@ -50,24 +56,23 @@ describe Oystercard do
   end
 
   describe "#touch_out" do
-    it  { is_expected.to respond_to(:touch_out) }
+    before(:each) do
+      card.top_up(Oystercard::LIMIT)
+      card.touch_in(:entry_station)
+      card.touch_out(:exit_station)
+    end
+
+    it  { is_expected.to respond_to(:touch_out).with(1).argument }
 
     it "returns false" do
-      card.touch_in(:entry_station)
-      card.touch_out
       expect(card).not_to be_in_journey
     end
 
     it " will change the balance by the minimum fare" do
-      card.top_up(Oystercard::LIMIT)
-      card.touch_in(:entry_station)
-      expect{ card.touch_out }.to change { card.balance }.by(-Oystercard::MINIMUM)
+      expect{ card.touch_out(:exit_station) }.to change { card.balance }.by(-Oystercard::MINIMUM)
     end
-
-    it " turns entry_station to nil" do
-      card.top_up(Oystercard::LIMIT)
-      card.touch_in(:entry_station)
-      expect(card.touch_out).to eq(nil)
+    it "creates a journey" do
+      expect(card.journeys).to eq(journey)
     end
   end
 
@@ -78,6 +83,8 @@ describe Oystercard do
       expect(card.in_journey?).to be(true).or be(false)
     end
   end
+
+
 
 
 end
