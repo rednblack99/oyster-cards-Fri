@@ -1,6 +1,6 @@
 class Oystercard
 
-  attr_reader :balance, :entry_station, :exit_station,  :journeys
+  attr_reader :balance, :entry_station, :exit_station, :journeys
 
   LIMIT = 90
   MINIMUM = 1
