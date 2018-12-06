@@ -3,6 +3,7 @@ require "oystercard"
 describe Oystercard do
 
   let(:card) { Oystercard.new }
+  let(:entry_station) { double(:entry_station) }
 
   it { is_expected.to respond_to(:balance) }
 
@@ -40,10 +41,10 @@ describe Oystercard do
       card.top_up(Oystercard::LIMIT)
     end
 
-    it  { is_expected.to respond_to(:touch_in) }
+    it  { is_expected.to respond_to(:touch_in).with(1).argument }
 
     it "returns true" do
-      card.touch_in
+      card.touch_in(:entry_station)
       expect(card).to be_in_journey
     end
   end
@@ -52,15 +53,21 @@ describe Oystercard do
     it  { is_expected.to respond_to(:touch_out) }
 
     it "returns false" do
-      card.touch_in
+      card.touch_in(:entry_station)
       card.touch_out
       expect(card).not_to be_in_journey
     end
 
     it " will change the balance by the minimum fare" do
       card.top_up(Oystercard::LIMIT)
-      card.touch_in
+      card.touch_in(:entry_station)
       expect{ card.touch_out }.to change { card.balance }.by(-Oystercard::MINIMUM)
+    end
+
+    it " turns entry_station to nil" do
+      card.top_up(Oystercard::LIMIT)
+      card.touch_in(:entry_station)
+      expect(card.touch_out).to eq(nil)
     end
   end
 
