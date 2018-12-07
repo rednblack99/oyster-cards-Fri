@@ -5,12 +5,13 @@ describe Oystercard do
   let(:card) { Oystercard.new }
   let(:entry_station) { double(:entry_station) }
   let(:exit_station) { double(:exit_station)}
-  let(:journey) { { :entry_station => :exit_station } }
+  let(:journey) { [[{:station=>:entry_station, :zone=>:zone}, {:station=>:exit_station, :zone=>:zone}]] }
+  let(:zone) { double(:zone)}
 
   it { is_expected.to respond_to(:balance) }
 
   it "journey is empty" do 
-    expect(card.journeys).to be_empty 
+    expect(card.journey_history).to be_empty 
    end 
 
   it "checks that initialized balance is 0" do
@@ -32,55 +33,49 @@ describe Oystercard do
     end
   end
 
-  # private methods cannot be tested
-  # describe "#deduct" do
-  #   it  { is_expected.to respond_to(:deduct).with(1).argument }
-  #
-  #   it "deducts a specific amount from the balance" do
-  #     card.top_up(90)
-  #     expect{ card.deduct(10) }.to change { card.balance }.by(-10)
-  #   end
-  # end
-
   describe "#touch_in" do
-    before(:each) do
-      card.top_up(Oystercard::LIMIT)
+    
+    it 'raises error when minimum fare not available' do
+      expect{ card.touch_in(:entry_station, :zone) }.to raise_error "Not enough money on card"
     end
 
-    it  { is_expected.to respond_to(:touch_in).with(1).argument }
+    it  { is_expected.to respond_to(:touch_in).with(2).arguments }
 
     it "returns true" do
-      card.touch_in(:entry_station)
-      expect(card).to be_in_journey
+      card.top_up(Oystercard::LIMIT)
+      card.touch_in(:entry_station, :zone)
+      expect(card.in_transit).to eq true
     end
   end
 
   describe "#touch_out" do
     before(:each) do
       card.top_up(Oystercard::LIMIT)
-      card.touch_in(:entry_station)
-      card.touch_out(:exit_station)
+      card.touch_in(:entry_station, :zone)
+      
     end
 
-    it  { is_expected.to respond_to(:touch_out).with(1).argument }
+    it  { is_expected.to respond_to(:touch_out).with(2).arguments }
 
     it "returns false" do
-      expect(card).not_to be_in_journey
+      card.touch_out(:exit_station, :zone)
+      expect(card.in_transit).to eq false
     end
 
     it " will change the balance by the minimum fare" do
-      expect{ card.touch_out(:exit_station) }.to change { card.balance }.by(-Oystercard::MINIMUM)
+      expect{ card.touch_out(:exit_station, :zone) }.to change { card.balance }.by(-Journey::MINIMUM)
     end
     it "creates a journey" do
-      expect(card.journeys).to eq(journey)
+      card.touch_out(:exit_station, :zone)
+      expect(card.journey_history).to eq(journey)
     end
   end
 
   describe "#in_journey?" do
-    it  { is_expected.to respond_to(:in_journey?) }
+    it  { is_expected.to respond_to(:in_transit) }
 
     it "returns either true or false" do
-      expect(card.in_journey?).to be(true).or be(false)
+      expect(card.in_transit).to be(true).or be(false)
     end
   end
 
